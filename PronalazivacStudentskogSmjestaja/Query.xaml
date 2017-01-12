@@ -1,0 +1,24 @@
+﻿<Page x:Class="PronalazivacStudentskogSmjestaja.Query"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:PronalazivacStudentskogSmjestaja"
+      mc:Ignorable="d" 
+      d:DesignHeight="330" d:DesignWidth="505"
+      Title="Query">
+
+    <Grid>
+        <TextBox x:Name="txtBoxQuery" HorizontalAlignment="Left" Height="55" Margin="73,68,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="375" FontSize="18" Background="#FF8B89AC" IsReadOnly="True"/>
+        <StackPanel Name="stckPnl" HorizontalAlignment="Left" Height="192" Margin="73,128,0,0" VerticalAlignment="Top" Width="375"/>
+        <Button x:Name="btnExit" Content="X" HorizontalAlignment="Left" Margin="465,10,0,0" VerticalAlignment="Top" Width="40" FontSize="18" FontWeight="Bold" Foreground="#FFC3C3C3" Click="btnExit_Click">
+            <Button.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FF7C0000" Offset="0"/>
+                    <GradientStop Color="#FFBD1212" Offset="1"/>
+                </LinearGradientBrush>
+            </Button.Background>
+        </Button>
+
+    </Grid>
+</Page>

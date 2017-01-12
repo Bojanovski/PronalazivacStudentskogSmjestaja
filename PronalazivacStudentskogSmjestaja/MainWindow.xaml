@@ -5,8 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PronalazivacStudentskogSmjestaja"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Pronalazivač studentskog smještaja" Height="350" Width="525" ResizeMode="NoResize" AllowsTransparency="True" WindowStyle="None" Background="{x:Null}">
     <Grid>
-        
+        <Rectangle HorizontalAlignment="Left" Height="330" Stroke="Black" VerticalAlignment="Top" Width="505" Margin="10,10,0,0" RadiusX="3" RadiusY="3" MouseDown="Rectangle_MouseDown">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="White"/>
+                    <GradientStop Color="#FF000A64" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <Frame Name="MainFrame" NavigationUIVisibility="Hidden" >
+
+        </Frame>
+
     </Grid>
 </Window>

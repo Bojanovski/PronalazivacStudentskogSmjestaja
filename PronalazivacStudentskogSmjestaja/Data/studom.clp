@@ -1,239 +1,169 @@
-;;
-;; izaberi studentski smjestaj
-;;
-;; get-info functions
-;;
 
-(deffunction ask-question (?question $?allowed-values)
-   (printout t ?question crlf)
-   (bind ?answer (read))
-   (if (lexemep ?answer) 
-       then (bind ?answer (lowcase ?answer)))
-   (while (not (member ?answer ?allowed-values)) do
-      (printout t ?question)
-      (bind ?answer (read))
-      (if (lexemep ?answer) 
-          then (bind ?answer (lowcase ?answer))))
-   ?answer)
+;;; ***************************
+;;; * DEFTEMPLATES & DEFFACTS *
+;;; ***************************
 
-(deffunction yes-or-no-p (?question)
-   (bind ?response (ask-question ?question da ne d n))
-   ?response)
+(deftemplate UI-state
+   (slot id (default-dynamic (gensym*)))
+   (slot display)
+   (slot relation-asserted (default none))
+   (slot response (default none))
+   (multislot valid-answers)
+   (multislot coded-answers)
+   (slot state (default middle)))
+   
+(deftemplate state-list
+   (slot current)
+   (multislot sequence))
+  
+(deffacts startup
+   (state-list))
+   
+;;;****************
+;;;* STARTUP RULE *
+;;;****************
 
-;;
-;; get info
-;;
+(defrule system-banner ""
 
+  =>
+  
+  (assert (UI-state (display "Molim odgovorite na sljedeca pitanja.")
+                    (relation-asserted start)
+                    (state initial)
+                    (valid-answers "u redu")
+                    (coded-answers 1))))
+
+;;;***************
+;;;* QUERY RULES *
+;;;***************
+  
 (defrule getVrstaSmjestaja ""
-	(declare (salience 5))
-	=>
-	(printout t "Odaberite vrstu smjestaja:" crlf)
-	(printout t "	a) studentski dom" crlf)
-	(printout t "	b) studentski/ucenicki dom" crlf)
-	(printout t "	c) privatni" crlf)
-	(printout t "	d) nije vazno" crlf)
-	(bind ?response (ask-question "Odabir (a/b/c/d):" a b c d))
-	(switch ?response
-		(case a then (bind ?response 100))
-		(case b then (bind ?response 200))
-		(case c then (bind ?response 300))
-		(case d then (bind ?response 10000))
-		(default none))
-	(assert (vrsta ?response)))
-
+	(logical (start 1))
+	=>  
+    (assert (UI-state (display "Odaberite vrstu smjestaja:")
+                (relation-asserted vrsta)
+                (response No)
+                (valid-answers "studentski dom" "studentski ucenicki dom" "privatni" "nije vazno")
+                (coded-answers 100 200 300 10000))))
+                
 (defrule getCijenaSmjestaja ""
-	(declare (salience 5))
+	(logical (start 1))
 	=>
-	(printout t crlf "Cijena smjestaja:" crlf)
-	(printout t "	a) niska" crlf)
-	(printout t "	b) srednja" crlf)
-	(printout t "	c) visoka" crlf)
-	(printout t "	d) ogromna" crlf)
-	(printout t "	e) nije vazno" crlf)
-	(bind ?response (ask-question "Odabir (a/b/c/d/e):" a b c d e))
-	(switch ?response
-		(case a then (bind ?response 200))
-		(case b then (bind ?response 400))
-		(case c then (bind ?response 1000))
-		(case d then (bind ?response 1500))
-		(case e then (bind ?response 10000))
-		(default none))
-	(assert (cijena ?response)))
+	(assert (UI-state (display "Cijena smjestaja:")
+                (relation-asserted cijena)
+                (response No)
+                (valid-answers "niska" "srednja" "visoka" "ogromna" "nije vazno")
+                (coded-answers 200 400 1000 1500 10000))))                    
 
 (defrule StudentSInvaliditetom ""
-  (declare (salience 5))
-   =>
-   (printout t crlf)
-   (bind ?response (yes-or-no-p "Soba je osposobljena za studente sa invaliditetom (da/ne)?"))
-   (assert (studinval ?response)))
+	(logical (start 1))
+    =>
+    (assert (UI-state (display "Soba je osposobljena za studente sa invaliditetom?")
+                (relation-asserted studinval)
+                (response No)
+                (valid-answers "da" "ne")
+                (coded-answers 1 0))))                    
 
 (defrule getVelicinaSobe ""
-	(declare (salience 5))
+	(logical (start 1))
 	=>
-	(printout t crlf "Odaberite velicinu sobe:" crlf)
-	(printout t "	a) mala" crlf)
-	(printout t "	b) srednja" crlf)
-	(printout t "	c) velika" crlf)
-	(printout t "	d) ogromna" crlf)
-	(printout t "	e) nije vazno" crlf)
-	(bind ?response (ask-question "Odabir (a/b/c/d/e):" a b c d e))
-	(switch ?response
-		(case a then (bind ?response 100))
-		(case b then (bind ?response 200))
-		(case c then (bind ?response 300))
-		(case d then (bind ?response 400))
-		(case e then (bind ?response 10000))
-		(default none))
-	(assert (velicina ?response)))
-
+    (assert (UI-state (display "Odaberite velicinu sobe:")
+                (relation-asserted velicina)
+                (response No)
+                (valid-answers "mala" "srednja" "velika" "ogromna" "nije vazno")
+                (coded-answers 100 200 300 400 10000))))                 
+                
 (defrule getKupaonica ""
-	(declare (salience 5))
+	(logical (start 1))
 	=>
-	(printout t crlf "Kupaonica:" crlf)
-	(printout t "	a) zajednicka" crlf)
-	(printout t "	b) vlastita" crlf)
-	(printout t "	c) nije vazno" crlf)
-	(bind ?response (ask-question "Odabir (a/b/c):" a b c))
-	(switch ?response
-		(case a then (bind ?response 100))
-		(case b then (bind ?response 200))
-		(case c then (bind ?response 10000))
-		(default none))
-	(assert (kupaonica ?response)))
-
+    (assert (UI-state (display "Kupaonica:")
+                (relation-asserted kupaonica)
+                (response No)
+                (valid-answers "zajednicka" "vlastita" "nije vazno")
+                (coded-answers 100 200 10000))))                    
+                
 (defrule getKuhinja ""
-	(declare (salience 5))
-	=>
-	(printout t crlf "Kuhinja:" crlf)
-	(printout t "	a) zajednicka" crlf)
-	(printout t "	b) vlastita" crlf)
-	(printout t "	c) nije vazno" crlf)
-	(bind ?response (ask-question "Odabir (a/b/c):" a b c))
-	(switch ?response
-		(case a then (bind ?response 100))
-		(case b then (bind ?response 200))
-		(case c then (bind ?response 10000))
-		(default none))
-	(assert (kuhinja ?response)))
+	(logical (start 1))
+	=>          
+    (assert (UI-state (display "Kuhinja:")
+                (relation-asserted kuhinja)
+                (response No)
+                (valid-answers "zajednicka" "vlastita" "nije vazno")
+                (coded-answers 100 200 10000))))  
 
 (defrule getNamjestenjeProstora ""
-	(declare (salience 5))
+	(logical (start 1))
 	=>
-	(printout t crlf "Namjestaj i uredjenje prostora:" crlf)
-	(printout t "	a) staro" crlf)
-	(printout t "	b) srednje" crlf)
-	(printout t "	c) novo" crlf)
-	(printout t "	d) luksuzno" crlf)
-	(printout t "	e) nije vazno" crlf)
-	(bind ?response (ask-question "Odabir (a/b/c/d/e):" a b c d e))
-	(switch ?response
-		(case a then (bind ?response 100))
-		(case b then (bind ?response 200))
-		(case c then (bind ?response 300))
-		(case d then (bind ?response 400))
-		(case e then (bind ?response 10000))
-		(default none))
-	(assert (namjestenost ?response)))
+    (assert (UI-state (display "Namjestaj i uredjenje prostora:")
+                (relation-asserted namjestenost)
+                (response No)
+                (valid-answers "staro" "srednje" "novo" "luksuzno" "nije vazno")
+                (coded-answers 100 200 300 400 10000))))  
 
 (defrule getBlizinaMenze ""
-	(declare (salience 5))
+	(logical (start 1))
 	=>
-	(printout t crlf "Blizina studentske menze:" crlf)
-	(printout t "	a) integrirano" crlf)
-	(printout t "	b) blizu" crlf)
-	(printout t "	c) udaljeno" crlf)
-	(printout t "	d) daleko" crlf)
-	(printout t "	e) nije vazno" crlf)
-	(bind ?response (ask-question "Odabir (a/b/c/d/e):" a b c d e))
-	(switch ?response
-		(case a then (bind ?response 100))
-		(case b then (bind ?response 200))
-		(case c then (bind ?response 300))
-		(case d then (bind ?response 400))
-		(case e then (bind ?response 10000))
-		(default none))
-	(assert (menza ?response)))
+    (assert (UI-state (display "Blizina studentske menze:")
+                (relation-asserted menza)
+                (response No)
+                (valid-answers "integrirano" "blizu" "udaljeno" "daleko" "nije vazno")
+                (coded-answers 100 200 300 400 10000))))  
 
 (defrule getBlizinaPraonice ""
-	(declare (salience 5))
+	(logical (start 1))
 	=>
-	(printout t crlf "Blizina praonice:" crlf)
-	(printout t "	a) integrirano" crlf)
-	(printout t "	b) blizu" crlf)
-	(printout t "	c) udaljeno" crlf)
-	(printout t "	d) daleko" crlf)
-	(printout t "	e) nije vazno" crlf)
-	(bind ?response (ask-question "Odabir (a/b/c/d/e):" a b c d e))
-	(switch ?response
-		(case a then (bind ?response 100))
-		(case b then (bind ?response 200))
-		(case c then (bind ?response 300))
-		(case d then (bind ?response 400))
-		(case e then (bind ?response 10000))
-		(default none))
-	(assert (praonica ?response)))
+    (assert (UI-state (display "Blizina praonice:")
+                (relation-asserted praonica)
+                (response No)
+                (valid-answers "integrirano" "blizu" "udaljeno" "daleko" "nije vazno")
+                (coded-answers 100 200 300 400 10000))))      
 
 (defrule getTrgovina ""
-	(declare (salience 5))
+	(logical (start 1))
 	=>
-	(printout t crlf "Trgovina:" crlf)
-	(printout t "	a) blizu" crlf)
-	(printout t "	b) udaljeno" crlf)
-	(printout t "	c) daleko" crlf)
-	(bind ?response (ask-question "Odabir (a/b/c):" a b c))
-	(switch ?response
-		(case a then (bind ?response 100))
-		(case b then (bind ?response 200))
-		(case c then (bind ?response 300))
-		(default none))
-	(assert (trgovina ?response)))
+    (assert (UI-state (display "Blizina trgovine:")
+                (relation-asserted trgovina)
+                (response No)
+                (valid-answers "blizu" "udaljeno" "daleko")
+                (coded-answers 100 200 300))))   
 
 (defrule getSport ""
-	(declare (salience 5))
+	(logical (start 1))
 	=>
-	(printout t crlf "Sport i teretana:" crlf)
-	(printout t "	a) integrirano" crlf)
-	(printout t "	b) blizu" crlf)
-	(printout t "	c) udaljeno" crlf)
-	(printout t "	d) daleko" crlf)
-	(bind ?response (ask-question "Odabir (a/b/c/d):" a b c d))
-	(switch ?response
-		(case a then (bind ?response 100))
-		(case b then (bind ?response 200))
-		(case c then (bind ?response 300))
-		(case d then (bind ?response 400))
-		(default none))
-	(assert (sport ?response)))
+    (assert (UI-state (display "Sport i teretana:")
+                (relation-asserted sport)
+                (response No)
+                (valid-answers "integrirano" "blizu" "udaljeno" "daleko")
+                (coded-answers 100 200 300 400))))       
 
 (defrule getBrojStanara ""
-	(declare (salience 5))
+	(logical (start 1))
 	=>
-	(printout t crlf "Broj stanara:" crlf)
-	(printout t "	a) 1" crlf)
-	(printout t "	b) 2" crlf)
-	(printout t "	c) >=3" crlf)
-	(printout t "	d) nije vazno" crlf)
-	(bind ?response (ask-question "Odabir (a/b/c/d):" a b c d))
-	(switch ?response
-		(case a then (bind ?response 100))
-		(case b then (bind ?response 200))
-		(case c then (bind ?response 300))
-		(case d then (bind ?response 10000))
-		(default none))
-	(assert (stanari ?response)))
-
-
-;;;
-;;;  BAZA ZNANJA - SMJESTAJ
-;;;
-
+    (assert (UI-state (display "Broj stanara:")
+                (relation-asserted stanari)
+                (response No)
+                (valid-answers "jedan" "dvoje" "troje ili vise" "nije vazno")
+                (coded-answers 100 200 300 10000))))       
+ 
+;;;****************
+;;;* DECISION RULES *
+;;;****************
+                     
+(defrule no-repairs ""
+   (declare (salience -10))
+   (logical (UI-state (id ?id)))
+   (state-list (current ?id))
+   =>
+   (assert (UI-state (display "Ne postoji odgovarajuci smjestaj.")
+                     (state final))))
+   
 ;;; Studentski dom Stjepan Radic k1-1
 (defrule stjepanradick11 ""
    (vrsta ?vrst)
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1000 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (>= 200 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -253,17 +183,16 @@
    (stanari ?stan)
    (test (>= 100 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Stjepan Radic Kategorija 1 Vrsta 1" crlf)
-   (assert (smjestaj stjepan-radic-k1-1)))
-
+   (assert (UI-state (display "Smjestaj: Studentski dom Stjepan Radic Kategorija 1 Vrsta 1")
+                     (state final))))
+                     
 ;;; Studentski dom Stjepan Radic k1-2
 (defrule stjepanradick12 ""
    (vrsta ?vrst)
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1000 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (>= 200 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -283,17 +212,16 @@
    (stanari ?stan)
    (test (= 200 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Stjepan Radic Kategorija 1 Vrsta 2" crlf)
-   (assert (smjestaj stjepan-radic-k1-2)))
-
+   (assert (UI-state (display "Smjestaj: Studentski dom Stjepan Radic Kategorija 1 Vrsta 2")
+                     (state final))))  
+                     
 ;;; Studentski dom Stjepan Radic k3-1
 (defrule stjepanradick31 ""
    (vrsta ?vrst)
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1000 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (>= 100 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -313,9 +241,8 @@
    (stanari ?stan)
    (test (= 100 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Stjepan Radic Kategorija 3 Vrsta 1" crlf)
-   (assert (smjestaj stjepan-radic-k3-1)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Stjepan Radic Kategorija 3 Vrsta 1")
+                     (state final))))  
 
 ;;; Studentski dom Stjepan Radic k3-2
 (defrule stjepanradick32 ""
@@ -323,7 +250,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 400 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (>= 100 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -343,9 +270,8 @@
    (stanari ?stan)
    (test (= 200 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Stjepan Radic Kategorija 3 Vrsta 2" crlf)
-   (assert (smjestaj stjepan-radic-k3-2)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Stjepan Radic Kategorija 3 Vrsta 2")
+                     (state final))))  
 
 ;;; Studentski dom Stjepan Radic k5
 (defrule stjepanradick5 ""
@@ -353,7 +279,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 400 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= 200 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -373,9 +299,8 @@
    (stanari ?stan)
    (test (= 200 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Stjepan Radic Kategorija 5" crlf)
-   (assert (smjestaj stjepan-radic-k5)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Stjepan Radic Kategorija 5")
+                     (state final))))  
 
 ;;; Studentski dom Stjepan Radic i1
 (defrule stjepanradici1 ""
@@ -383,7 +308,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1000 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval da)
+   (studinval ?stinv) (test (= 1 ?stinv))
    (velicina ?vel)
    (or (test (= 300 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -403,9 +328,8 @@
    (stanari ?stan)
    (test (= 100 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Stjepan Radic Kategorija i1" crlf)
-   (assert (smjestaj stjepan-radic-i1)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Stjepan Radic Kategorija i1")
+                     (state final))))  
 
 ;;; Studentski dom Stjepan Radic i2
 (defrule stjepanradici1 ""
@@ -413,7 +337,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1000 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval da)
+   (studinval ?stinv) (test (= 1 ?stinv))
    (velicina ?vel)
    (or (test (= 300 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -433,9 +357,8 @@
    (stanari ?stan)
    (test (= 200 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Stjepan Radic Kategorija i2" crlf)
-   (assert (smjestaj stjepan-radic-i2)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Stjepan Radic Kategorija i2")
+                     (state final))))  
 
 ;;; Studentski dom Cvjetno naselje k2-11
 (defrule cvjetnonaseljek211 ""
@@ -443,7 +366,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1000 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= 200 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -463,9 +386,8 @@
    (stanari ?stan)
    (test (= 100 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Cvjetno naselje Kategorija k2-11" crlf)
-   (assert (smjestaj cvjetno-naselje-k2-11)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Cvjetno naselje Kategorija k2-11")
+                     (state final))))  
 
 ;;; Studentski dom Cvjetno naselje k2-12
 (defrule cvjetnonaseljek212 ""
@@ -473,7 +395,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1000 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= 200 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -493,9 +415,8 @@
    (stanari ?stan)
    (test (= 100 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Cvjetno naselje Kategorija k2-12" crlf)
-   (assert (smjestaj cvjetno-naselje-k2-12)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Cvjetno naselje Kategorija k2-12")
+                     (state final))))  
 
 ;;; Studentski dom Cvjetno naselje k2-21
 (defrule cvjetnonaseljek221 ""
@@ -503,7 +424,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1000 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= 200 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -523,9 +444,8 @@
    (stanari ?stan)
    (test (= 200 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Cvjetno naselje Kategorija k2-21" crlf)
-   (assert (smjestaj cvjetno-naselje-k2-21)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Cvjetno naselje Kategorija k2-21")
+                     (state final))))  
 
 ;;; Studentski dom Cvjetno naselje k2-22
 (defrule cvjetnonaseljek222 ""
@@ -533,7 +453,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1000 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= 200 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -553,9 +473,8 @@
    (stanari ?stan)
    (test (= 200 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Cvjetno naselje Kategorija k2-22" crlf)
-   (assert (smjestaj cvjetno-naselje-k2-22)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Cvjetno naselje Kategorija k2-22")
+                     (state final))))  
 
 ;;; Studentski dom Cvjetno naselje i1
 (defrule cvjetnonaseljei1 ""
@@ -563,7 +482,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1000 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval da)
+   (studinval ?stinv) (test (= 1 ?stinv))
    (velicina ?vel)
    (or (test (= 200 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -583,9 +502,8 @@
    (stanari ?stan)
    (test (= 100 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Cvjetno naselje Kategorija i1" crlf)
-   (assert (smjestaj cvjetno-naselje-i1)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Cvjetno naselje Kategorija i1")
+                     (state final))))  
 
 ;;; Studentski dom Cvjetno naselje i2
 (defrule cvjetnonaseljei2 ""
@@ -593,7 +511,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1000 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval da)
+   (studinval ?stinv) (test (= 1 ?stinv))
    (velicina ?vel)
    (or (test (= 200 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -613,9 +531,8 @@
    (stanari ?stan)
    (test (= 200 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Cvjetno naselje Kategorija i2" crlf)
-   (assert (smjestaj cvjetno-naselje-i2)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Cvjetno naselje Kategorija i2")
+                     (state final))))  
 
 ;;; Studentski dom Ante Starcevic k5-1
 (defrule antestarcevick51 ""
@@ -623,7 +540,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 400 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= 100 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -643,9 +560,8 @@
    (stanari ?stan)
    (test (= 100 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Ante Starcevic Kategorija k5-1" crlf)
-   (assert (smjestaj ante-starcevic-k5-1)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Ante Starcevic Kategorija k5-1")
+                     (state final))))  
 
 ;;; Studentski dom Ante Starcevic k5-2
 (defrule antestarcevick52 ""
@@ -653,7 +569,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 400 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= 100 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -673,9 +589,8 @@
    (stanari ?stan)
    (test (= 200 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Ante Starcevic Kategorija k5-2" crlf)
-   (assert (smjestaj ante-starcevic-k5-2)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Ante Starcevic Kategorija k5-2")
+                     (state final))))  
 
 ;;; Studentski dom Ante Starcevic i1-1
 (defrule antestarcevici11 ""
@@ -683,7 +598,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 400 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval da)
+   (studinval ?stinv) (test (= 1 ?stinv))
    (velicina ?vel)
    (or (test (<= 200 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -703,9 +618,8 @@
    (stanari ?stan)
    (test (= 100 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Ante Starcevic Kategorija i1-1" crlf)
-   (assert (smjestaj ante-starcevic-i1-1)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Ante Starcevic Kategorija i1-1")
+                     (state final))))  
 
 ;;; Studentski dom Ante Starcevic i1-2
 (defrule antestarcevici12 ""
@@ -713,7 +627,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 400 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval da)
+   (studinval ?stinv) (test (= 1 ?stinv))
    (velicina ?vel)
    (or (test (<= 200 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -733,9 +647,8 @@
    (stanari ?stan)
    (test (= 200 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Ante Starcevic Kategorija i1-2" crlf)
-   (assert (smjestaj ante-starcevic-i1-2)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Ante Starcevic Kategorija i1-2")
+                     (state final))))  
 
 ;;; Studentski dom Lascina k6-1
 (defrule lascinak61 ""
@@ -743,7 +656,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 200 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= 100 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -763,9 +676,8 @@
    (stanari ?stan)
    (test (= 100 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Lascina Kategorija k6-1" crlf)
-   (assert (smjestaj lascina-k6-1)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Lascina Kategorija k6-1")
+                     (state final))))  
 
 ;;; Studentski dom Lascina k6-2
 (defrule lascinak62 ""
@@ -773,7 +685,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 200 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= 100 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -793,9 +705,8 @@
    (stanari ?stan)
    (test (= 200 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Lascina Kategorija k6-2" crlf)
-   (assert (smjestaj lascina-k6-2)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Lascina Kategorija k6-2")
+                     (state final))))  
 
 ;;; Studentski dom Lascina k7
 (defrule lascinak7 ""
@@ -803,7 +714,7 @@
    (or (test (= 100 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 200 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= 100 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -823,9 +734,8 @@
    (stanari ?stan)
    (test (= 200 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Studentski dom Lascina Kategorija k7" crlf)
-   (assert (smjestaj lascina-k7)))
+   (assert (UI-state (display "Smjestaj: Studentski dom Lascina Kategorija k7")
+                     (state final))))  
 
 ;;; Ucenicki/Studentski dom Novi Zagreb
 (defrule novizagreb ""
@@ -833,7 +743,7 @@
    (or (test (= 200 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1000 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= 100 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -853,9 +763,8 @@
    (stanari ?stan)
    (test (= 300 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Ucenicki/Studentski dom Novi Zagreb" crlf)
-   (assert (smjestaj novizagreb)))
+   (assert (UI-state (display "Smjestaj: Ucenicki/Studentski dom Novi Zagreb")
+                     (state final))))  
 
 ;;; Ucenicki/Studentski dom Franje Bucara k1
 (defrule franjebucarak1 ""
@@ -863,7 +772,7 @@
    (or (test (= 200 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1000 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= 100 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -883,9 +792,8 @@
    (stanari ?stan)
    (test (= 300 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Ucenicki/Studentski dom Franje Bucara Kategorija 1" crlf)
-   (assert (smjestaj franjebucara-k1)))
+   (assert (UI-state (display "Smjestaj: Ucenicki/Studentski dom Franje Bucara Kategorija 1")
+                     (state final))))  
 
 ;;; Ucenicki/Studentski dom Franje Bucara k2
 (defrule franjebucarak2 ""
@@ -893,7 +801,7 @@
    (or (test (= 200 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1000 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= 200 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -913,9 +821,8 @@
    (stanari ?stan)
    (test (= 300 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Ucenicki/Studentski dom Franje Bucara Kategorija 2" crlf)
-   (assert (smjestaj franjebucara-k2)))
+   (assert (UI-state (display "Smjestaj: Ucenicki/Studentski dom Franje Bucara Kategorija 2")
+                     (state final))))  
 
 ;;; Privatni smjestaj sobe Maksimir
 (defrule sobemaksimir ""
@@ -923,7 +830,7 @@
    (or (test (= 300 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1500 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= 300 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -943,9 +850,8 @@
    (stanari ?stan)
    (test (= 300 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: privatni Sobe Maksimir " crlf)
-   (assert (smjestaj sobemaksimir)))
+   (assert (UI-state (display "Smjestaj: privatni Sobe Maksimir ")
+                     (state final))))  
 
 ;;; Mali studentski dom Crnomerec 1
 (defrule crnomerec1 ""
@@ -953,7 +859,7 @@
    (or (test (= 300 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1500 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= 300 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -973,9 +879,8 @@
    (stanari ?stan)
    (test (= 100 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Mali studentski dom Crnomerec 1 " crlf)
-   (assert (smjestaj crnomerec1)))
+   (assert (UI-state (display "Smjestaj: Mali studentski dom Crnomerec 1 ")
+                     (state final))))  
 
 ;;; Mali studentski dom Crnomerec 2
 (defrule crnomerec2 ""
@@ -983,7 +888,7 @@
    (or (test (= 300 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1500 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= 300 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -1003,9 +908,8 @@
    (stanari ?stan)
    (test (= 200 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: Mali studentski dom Crnomerec 2 " crlf)
-   (assert (smjestaj crnomerec2)))
+   (assert (UI-state (display "Smjestaj: Mali studentski dom Crnomerec 2 ")
+                     (state final))))  
 
 ;;; Privatni smjestaj sobe Savica
 (defrule savica ""
@@ -1013,7 +917,7 @@
    (or (test (= 300 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1500 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= 100 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -1033,9 +937,8 @@
    (stanari ?stan)
    (test (= 100 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: privatni Sobe Savica " crlf)
-   (assert (smjestaj sobesavica)))
+   (assert (UI-state (display "Smjestaj: privatni Sobe Savica ")
+                     (state final))))  
 
 ;;; Privatni smjestaj sobe Trg bana Josipa Jelacica
 (defrule trgjosipajelacica ""
@@ -1043,7 +946,7 @@
    (or (test (= 300 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1500 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= 300 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -1063,9 +966,8 @@
    (stanari ?stan)
    (test (= 100 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: privatni Sobe Trg bana Josipa Jelacica " crlf)
-   (assert (smjestaj josipajelacica)))
+   (assert (UI-state (display "Smjestaj: privatni Sobe Trg bana Josipa Jelacica ")
+                     (state final))))  
 
 ;;; Privatni smjestaj sobe Vrbik
 (defrule vrbik ""
@@ -1073,7 +975,7 @@
    (or (test (= 300 ?vrst)) (test (<= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= 1500 ?cije)) (test (<= 10000 ?cije)) )
-   (studinval ne)
+   (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= 200 ?vel)) (test (<= 10000 ?vel)) )
    (kupaonica ?kup)
@@ -1093,33 +995,162 @@
    (stanari ?stan)
    (test (= 100 ?stan))
    =>
-   (printout t crlf)
-   (printout t "Smjestaj: privatni Sobe Vrbik " crlf)
-   (assert (smjestaj vrbik)))
+   (assert (UI-state (display "Smjestaj: privatni Sobe Vrbik ")
+                     (state final))))  
+   
+;;;*************************
+;;;* GUI INTERACTION RULES *
+;;;*************************
 
-;;;
-;;; PROGRAM
-;;;
+(defrule ask-question
 
-(defrule system-banner ""
-  (declare (salience 10))
-  =>
-  (printout t crlf crlf)
-  (printout t "Preporuka studentskog smjestaja")
-  (printout t crlf crlf))
-
-(defrule PreporuceniSmjestaj ""
-  (declare (salience 3))
-  (not (header-printed))
-  =>
-  (printout t crlf crlf)
-  (printout t "Preporuceni smjestaj:" crlf)
-  (assert (header-printed)))
-
-(defrule None
-   (declare (salience -100))
-   (not (smjestaj ?))
+   (declare (salience 5))
+   
+   (UI-state (id ?id))
+   
+   ?f <- (state-list (sequence $?s&:(not (member$ ?id ?s))))
+             
    =>
-   (printout t "Ne postoji odgovarajuci smjestaj." crlf))
+   
+   (modify ?f (current ?id)
+              (sequence ?id ?s))
+   
+   (halt))
 
+(defrule handle-next-no-change-none-middle-of-chain
 
+   (declare (salience 10))
+   
+   ?f1 <- (next ?id)
+
+   ?f2 <- (state-list (current ?id) (sequence $? ?nid ?id $?))
+                      
+   =>
+      
+   (retract ?f1)
+   
+   (modify ?f2 (current ?nid))
+   
+   (halt))
+
+(defrule handle-next-response-none-end-of-chain
+
+   (declare (salience 10))
+   
+   ?f <- (next ?id)
+
+   (state-list (sequence ?id $?))
+   
+   (UI-state (id ?id)
+             (relation-asserted ?relation))
+                   
+   =>
+      
+   (retract ?f)
+
+   (assert (add-response ?id)))   
+
+(defrule handle-next-no-change-middle-of-chain
+
+   (declare (salience 10))
+   
+   ?f1 <- (next ?id ?response)
+
+   ?f2 <- (state-list (current ?id) (sequence $? ?nid ?id $?))
+     
+   (UI-state (id ?id) (response ?response))
+   
+   =>
+      
+   (retract ?f1)
+   
+   (modify ?f2 (current ?nid))
+   
+   (halt))
+
+(defrule handle-next-change-middle-of-chain
+
+   (declare (salience 10))
+   
+   (next ?id ?response)
+
+   ?f1 <- (state-list (current ?id) (sequence ?nid $?b ?id $?e))
+     
+   (UI-state (id ?id) (response ~?response))
+   
+   ?f2 <- (UI-state (id ?nid))
+   
+   =>
+         
+   (modify ?f1 (sequence ?b ?id ?e))
+   
+   (retract ?f2))
+   
+(defrule handle-next-response-end-of-chain
+
+   (declare (salience 10))
+   
+   ?f1 <- (next ?id ?response)
+   
+   (state-list (sequence ?id $?))
+   
+   ?f2 <- (UI-state (id ?id)
+                    (response ?expected)
+                    (relation-asserted ?relation))
+                
+   =>
+      
+   (retract ?f1)
+
+   (if (neq ?response ?expected)
+      then
+      (modify ?f2 (response ?response)))
+      
+   (assert (add-response ?id ?response)))   
+
+(defrule handle-add-response
+
+   (declare (salience 10))
+   
+   (logical (UI-state (id ?id)
+                      (relation-asserted ?relation)))
+   
+   ?f1 <- (add-response ?id ?response)
+                
+   =>
+      
+   (str-assert (str-cat "(" ?relation " " ?response ")"))
+   
+   (retract ?f1))   
+
+(defrule handle-add-response-none
+
+   (declare (salience 10))
+   
+   (logical (UI-state (id ?id)
+                      (relation-asserted ?relation)))
+   
+   ?f1 <- (add-response ?id)
+                
+   =>
+      
+   (str-assert (str-cat "(" ?relation ")"))
+   
+   (retract ?f1))   
+
+(defrule handle-prev
+
+   (declare (salience 10))
+      
+   ?f1 <- (prev ?id)
+   
+   ?f2 <- (state-list (sequence $?b ?id ?p $?e))
+                
+   =>
+   
+   (retract ?f1)
+   
+   (modify ?f2 (current ?p))
+   
+   (halt))
+   

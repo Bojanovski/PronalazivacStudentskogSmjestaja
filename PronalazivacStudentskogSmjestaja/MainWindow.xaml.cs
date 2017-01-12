@@ -13,6 +13,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using System.Diagnostics;
+using System.IO;
+
 namespace PronalazivacStudentskogSmjestaja
 {
     /// <summary>
@@ -20,9 +23,23 @@ namespace PronalazivacStudentskogSmjestaja
     /// </summary>
     public partial class MainWindow : Window
     {
+        public Mommosoft.ExpertSystem.Environment mEnv;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            mEnv = new Mommosoft.ExpertSystem.Environment();
+            mEnv.AddRouter(new DebugRouter());
+            mEnv.Load("Data/studom.clp");
+            mEnv.Reset();
+
+            MainFrame.Content = new Main();
+        }
+
+        private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DragMove();
         }
     }
 }
