@@ -1,4 +1,4 @@
-# PronalazivacStudentskogSmjestaja
+# Pronalazivac studentskog smjestaja
 Ekspertni sustav za pomoc studentima pri pronalasku smjestaja.
 
 # Student accommodation finder
