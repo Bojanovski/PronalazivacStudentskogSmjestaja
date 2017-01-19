@@ -44,7 +44,8 @@ namespace PronalazivacStudentskogSmjestaja
                 evalStr = "(find-all-facts ((?f UI-state)) " + "(eq ?f:id " + currentID + "))";
             }
 
-            using (FactAddressValue evalFact = (FactAddressValue)((MultifieldValue)mMainWnd.mEnv.Eval(evalStr))[0])
+            MultifieldValue mfV = (MultifieldValue)mMainWnd.mEnv.Eval(evalStr);
+            using (FactAddressValue evalFact = (FactAddressValue)(mfV)[0])
             {
                 string state = evalFact.GetFactSlot("state").ToString();
                 if (state.Equals("initial"))
@@ -75,6 +76,8 @@ namespace PronalazivacStudentskogSmjestaja
                                 btn.Click += new RoutedEventHandler(btn_Click);
                                 stckPnl.Children.Add(btn);
                             }
+
+                            txtBoxQuery.Text = GetString((SymbolValue)evalFact.GetFactSlot("display"));
                         }
                         else // add reset button
                         {
@@ -83,9 +86,35 @@ namespace PronalazivacStudentskogSmjestaja
                             btn.Content = "ponovi";
                             btn.Click += new RoutedEventHandler(btnReset_Click);
                             stckPnl.Children.Add(btn);
+
+                            // create string from all the applicable rules (multiple solutions)
+                            string disp = "";
+                            MultifieldValue mfVNew = mfV;
+                            FactAddressValue evalFactNew = evalFact;
+                            do
+                            {
+                                string stateNew = evalFactNew.GetFactSlot("state").ToString();
+                                if (stateNew.Equals("unsuccessful") && disp.Length > 0)
+                                {
+                                    break;
+                                }
+
+                                disp += GetString((SymbolValue)evalFactNew.GetFactSlot("display")) + "\n";
+                                mMainWnd.mEnv.Run();
+                                String evalStrNew = "(find-all-facts ((?f state-list)) TRUE)";
+                                using (FactAddressValue allFacts = (FactAddressValue)((MultifieldValue)mMainWnd.mEnv.Eval(evalStrNew))[0])
+                                {
+                                    string currentID = allFacts.GetFactSlot("current").ToString();
+                                    evalStrNew = "(find-all-facts ((?f UI-state)) " + "(eq ?f:id " + currentID + "))";
+                                }
+
+                                mfVNew = (MultifieldValue)mMainWnd.mEnv.Eval(evalStrNew);
+                                evalFactNew = (FactAddressValue)(mfVNew)[0];
+                            } while (true);
+
+                            txtBoxQuery.Text = disp;
                         }
                     }
-                    txtBoxQuery.Text = GetString((SymbolValue)evalFact.GetFactSlot("display"));
                 }
             }
         }

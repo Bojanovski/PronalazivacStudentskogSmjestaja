@@ -150,13 +150,13 @@
 ;;;* DECISION RULES *
 ;;;****************
                      
-(defrule no-repairs ""
+(defrule no-solution ""
    (declare (salience -10))
    (logical (UI-state (id ?id)))
    (state-list (current ?id))
    =>
    (assert (UI-state (display "Ne postoji odgovarajuci smjestaj.")
-                     (state final))))
+                     (state unsuccessful))))
    
 ;;; Studentski dom Stjepan Radic k1-1
 (defrule stjepanradick11 ""
@@ -164,7 +164,6 @@
    (or (test (= 100 ?vrst)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1000)) (test (= 10000 ?cije)) )
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 300)) (test (= 10000 ?vel)) )
@@ -194,7 +193,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1000)) (test (= 10000 ?cije)) )
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 300)) (test (= 10000 ?vel)) )
@@ -226,7 +224,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1000)) (test (= 10000 ?cije)) )
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= ?vel 100)) (test (= 10000 ?vel)) )
@@ -256,8 +253,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 400)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= ?vel 100)) (test (= 10000 ?vel)) )
@@ -287,8 +282,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 400)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 200)) (test (= 10000 ?vel)) )
@@ -318,8 +311,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1000)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 1 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 300)) (test (= 10000 ?vel)) )
@@ -349,8 +340,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1000)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 1 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 300)) (test (= 10000 ?vel)) )
@@ -374,42 +363,12 @@
    (assert (UI-state (display "Smjestaj: Studentski dom Stjepan Radic Kategorija i2")
                      (state final))))  
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ;;; Studentski dom Cvjetno naselje k2-11
 (defrule cvjetnonaseljek211 ""
    (vrsta ?vrst)
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1000)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 200)) (test (= 10000 ?vel)) )
@@ -439,8 +398,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1000)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 200)) (test (= 10000 ?vel)) )
@@ -470,8 +427,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1000)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 200)) (test (= 10000 ?vel)) )
@@ -501,8 +456,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1000)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 200)) (test (= 10000 ?vel)) )
@@ -532,8 +485,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1000)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 1 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 200)) (test (= 10000 ?vel)) )
@@ -563,8 +514,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1000)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 1 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 200)) (test (= 10000 ?vel)) )
@@ -594,8 +543,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 400)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= ?vel 100)) (test (= 10000 ?vel)) )
@@ -625,8 +572,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 400)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= ?vel 100)) (test (= 10000 ?vel)) )
@@ -656,8 +601,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 400)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 1 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 200)) (test (= 10000 ?vel)) )
@@ -687,8 +630,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 400)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 1 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 200)) (test (= 10000 ?vel)) )
@@ -718,8 +659,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 200)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= ?vel 100)) (test (= 10000 ?vel)) )
@@ -749,8 +688,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 200)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= ?vel 100)) (test (= 10000 ?vel)) )
@@ -780,8 +717,6 @@
    (or (test (= ?vrst 100)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 200)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= ?vel 100)) (test (= 10000 ?vel)) )
@@ -811,8 +746,6 @@
    (or (test (= ?vrst 200)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1000)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= ?vel 100)) (test (= 10000 ?vel)) )
@@ -842,8 +775,6 @@
    (or (test (= ?vrst 200)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1000)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= ?vel 100)) (test (= 10000 ?vel)) )
@@ -873,8 +804,6 @@
    (or (test (= ?vrst 200)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1000)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 200)) (test (= 10000 ?vel)) )
@@ -904,8 +833,6 @@
    (or (test (= ?vrst 300)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1000)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= ?vel 100)) (test (= 10000 ?vel)) )
@@ -935,8 +862,6 @@
    (or (test (= ?vrst 300)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1500)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 300)) (test (= 10000 ?vel)) )
@@ -966,8 +891,6 @@
    (or (test (= ?vrst 300)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1500)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 300)) (test (= 10000 ?vel)) )
@@ -997,8 +920,6 @@
    (or (test (= ?vrst 300)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1500)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (= ?vel 100)) (test (= 10000 ?vel)) )
@@ -1028,8 +949,6 @@
    (or (test (= ?vrst 300)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1500)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 300)) (test (= 10000 ?vel)) )
@@ -1059,8 +978,6 @@
    (or (test (= ?vrst 300)) (test (= 10000 ?vrst)) )
    (cijena ?cije)
    (or (test (>= ?cije 1500)) (test (= 10000 ?cije)) )
-
-
    (studinval ?stinv) (test (= 0 ?stinv))
    (velicina ?vel)
    (or (test (<= ?vel 200)) (test (= 10000 ?vel)) )

@@ -9,8 +9,8 @@
       Title="Query">
 
     <Grid>
-        <TextBox x:Name="txtBoxQuery" HorizontalAlignment="Left" Height="55" Margin="73,68,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="375" FontSize="18" Background="#FF8B89AC" IsReadOnly="True"/>
-        <StackPanel Name="stckPnl" HorizontalAlignment="Left" Height="192" Margin="73,128,0,0" VerticalAlignment="Top" Width="375"/>
+        <TextBox x:Name="txtBoxQuery" HorizontalAlignment="Left" Height="125" Margin="73,50,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="375" FontSize="18" Background="#FF8B89AC" IsReadOnly="True"/>
+        <StackPanel Name="stckPnl" HorizontalAlignment="Left" Height="140" Margin="73,180,0,0" VerticalAlignment="Top" Width="375"/>
         <Button x:Name="btnExit" Content="X" HorizontalAlignment="Left" Margin="465,10,0,0" VerticalAlignment="Top" Width="40" FontSize="18" FontWeight="Bold" Foreground="#FFC3C3C3" Click="btnExit_Click">
             <Button.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
