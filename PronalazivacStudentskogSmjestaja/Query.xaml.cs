@@ -77,7 +77,7 @@ namespace PronalazivacStudentskogSmjestaja
                                 stckPnl.Children.Add(btn);
                             }
 
-                            txtBoxQuery.Text = GetString((SymbolValue)evalFact.GetFactSlot("display"));
+                            txtBoxQuery.Text = (SymbolValue)evalFact.GetFactSlot("display");
                         }
                         else // add reset button
                         {
@@ -99,7 +99,7 @@ namespace PronalazivacStudentskogSmjestaja
                                     break;
                                 }
 
-                                disp += GetString((SymbolValue)evalFactNew.GetFactSlot("display")) + "\n";
+                                disp += (SymbolValue)evalFactNew.GetFactSlot("display") + "\n";
                                 mMainWnd.mEnv.Run();
                                 String evalStrNew = "(find-all-facts ((?f state-list)) TRUE)";
                                 using (FactAddressValue allFacts = (FactAddressValue)((MultifieldValue)mMainWnd.mEnv.Eval(evalStrNew))[0])
@@ -143,13 +143,6 @@ namespace PronalazivacStudentskogSmjestaja
                 }
                 RunExpertSystem();
             }
-        }
-
-
-        private string GetString(string name)
-        {
-            return name;
-            //return SR.ResourceManager.GetString(name);
         }
 
         private void btnExit_Click(object sender, RoutedEventArgs e)
