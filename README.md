@@ -1,10 +1,10 @@
 # Pronalazivac studentskog smjestaja
 Ekspertni sustav za pomoc studentima pri pronalasku smjestaja.
 
-![alt text](Wallpaper.png)
-
 # Student accommodation finder
 Expert system to support students in finding accommodation.
+
+![alt text](Wallpaper.png)
 
 **************************************************************
 Clanovi tima / team members:
